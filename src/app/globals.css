@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+/*
+ * App theme ("bold"), matched to the Artzwork PC logo: deep navy-indigo with a magenta glow,
+ * periwinkle-blue buttons and links (no red buttons), the logo's red-to-magenta gradient for
+ * brand moments ("PC", thin lines), Oswald for big headings.
+ * Pages use these through Tailwind classes (bg-surface, text-muted, ...), never as hex.
+ * Contrast checked: text 15:1+, muted 7.7:1 on cards, button text 7.6:1, links 6.8:1.
+ */
+:root {
+  color-scheme: dark; /* native checkboxes, selects and scrollbars render dark too */
+  --background: #070b24;
+  --foreground: #eef0ff;
+  --surface: #0f1640;
+  --border: #26317a;
+  --muted: #a3aad6;
+  /* --primary, --surface and --primary-foreground are also in src/features/shared/lib/branding.ts
+     (accent readability check); change both together. */
+  --primary: #8b9bff;
+  --primary-foreground: #070b24;
+  --danger: #fb7185;
+  --danger-surface: #2a1424;
+  --success: #4ade80;
+  --success-surface: #0f2a1f;
+  /* Dims the page behind a dialog (the background colour, mostly opaque). */
+  --overlay: rgb(7 11 36 / 0.78);
+  /* Chart series colour, validated against --surface (dataviz validate_palette, dark mode). */
+  --chart-1: #6366f1;
+  /* The logo's red (the "A" and the "PC") and its magenta glow: brand moments only, never buttons. */
+  --brand-red: #e3262f;
+  --accent-2: #d946ef;
+  /* A raised surface inside cards (hover rows, chips). */
+  --surface-2: #16205a;
+  --gradient-brand: linear-gradient(90deg, var(--brand-red), var(--accent-2));
+  --glow: color-mix(in oklab, var(--primary) 45%, transparent);
+}
+
+/* Printing (order summaries): dark ink on white paper. */
+@media print {
+  :root {
+    color-scheme: light;
+    --background: #ffffff;
+    --foreground: #111111;
+    --surface: #ffffff;
+    --border: #cccccc;
+    --muted: #444444;
+    --primary: #111111;
+    --primary-foreground: #ffffff;
+    --success: #111111;
+    --success-surface: #ffffff;
+    --danger: #111111;
+    --danger-surface: #ffffff;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-danger: var(--danger);
+  --color-danger-surface: var(--danger-surface);
+  --color-success: var(--success);
+  --color-success-surface: var(--success-surface);
+  --color-overlay: var(--overlay);
+  --color-chart-1: var(--chart-1);
+  --color-accent-2: var(--accent-2);
+  --color-brand-red: var(--brand-red);
+  --color-surface-2: var(--surface-2);
+  --font-display: var(--font-oswald), var(--font-geist-sans), ui-sans-serif, sans-serif;
+  --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--primary) 35%, transparent), 0 12px 40px -12px var(--glow);
+  --animate-fade-up: fade-up 0.6s ease-out both;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  /* A soft neon glow at the top of every page, on the navy background. */
+  background:
+    radial-gradient(55rem 30rem at 0% -10%, color-mix(in oklab, var(--accent-2) 16%, transparent), transparent 70%),
+    radial-gradient(55rem 30rem at 100% 0%, color-mix(in oklab, #2f4bff 22%, transparent), transparent 70%),
+    var(--background);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Big page titles in the display face; smaller headings stay in the body font for readability. */
+h1 {
+  /* The Oswald variable directly: theme values marked inline only exist inside utilities. */
+  font-family: var(--font-oswald), var(--font-geist-sans), ui-sans-serif, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/* One word of a heading in the brand gradient (e.g. the "PC" in the hero). */
+.text-gradient {
+  background-image: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* People who ask for less motion get none. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+}

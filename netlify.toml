@@ -1,0 +1,11 @@
+# Netlify builds this Next.js app with its Next.js runtime (detected automatically).
+# Two Netlify sites use this same code: the shop (e.g. artzworkpc.netlify.app) and the
+# seller admin (e.g. artzworkpc-admin.netlify.app). SELLER_HOST, set on both sites, tells
+# the app which address is the admin. See README "Go online".
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"
