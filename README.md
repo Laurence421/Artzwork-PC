@@ -40,7 +40,8 @@ An online store built for a Philippine PC shop: computer parts, PC sets and acce
 |---|---|
 | **Stack** | Next.js 16 (App Router, Cache Components, server actions), React 19, TypeScript, Tailwind CSS 4, Supabase (Postgres, Auth, Storage) |
 | **Two sites, one app** | The proxy picks the site by host (`SELLER_HOST`) and serves the admin from `src/app/(seller)/seller`; logins are separate per site |
-| **Security** | Row-level security on every table; money and status changes only through `SECURITY DEFINER` functions; payments confirmed only by the server (shared secret, exact amount, idempotent); spam limits on unpaid orders; signed webhooks; password reset only from the email link; security headers (frame-ancestors, nosniff, HSTS) |
+| **Hosting** | Netlify Free (two sites from one repo) and Supabase Free; a daily scheduled function keeps the free database from pausing. Runs at no monthly cost |
+| **Security** | Row-level security on every table; money and status changes only through `SECURITY DEFINER` functions; payments confirmed only by the server (shared secret, exact amount, idempotent); spam limits on unpaid orders; signed webhooks; password reset only from the email link; the admin has no public sign-up and lets in only the owner's account; security headers (frame-ancestors, nosniff, HSTS) |
 | **Speed & cost** | Pages pre-rendered and streamed; catalogue cached with tags and refreshed on change; session read from the ES256-signed token (no Auth round trip); photos shrunk to WebP in the browser before upload and served as AVIF/WebP; unused uploads removed automatically; live pages poll a one-row version check and re-render only on change |
 | **Tests** | 70 unit and database tests (`vitest`, Postgres in memory via PGlite) plus browser end-to-end runs of checkout, payments, tracking and password reset |
 
@@ -72,3 +73,12 @@ Architecture decisions: [docs/adr/ADR-001-platform-architecture.md](docs/adr/ADR
 5. In Supabase → **Authentication → URL Configuration**, add `http://localhost:3000/auth/confirm` and `http://admin.localhost:3000/auth/confirm` as redirect URLs.
 
 Optional settings (emails through Resend, PayMongo, the SMS payment check) are described in `.env.example`.
+
+## Go online
+
+The app runs as **two Netlify sites built from the same repo**: one for the shop, one for the admin. Both are free.
+
+1. On Netlify, import the repo twice: once for the shop and once for the admin. `netlify.toml` already holds the build settings (`npm run build`, Node 22, Netlify's Next.js runtime).
+2. Give **both sites the same environment variables**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SELLER_HOST` (the admin site's host, e.g. `my-shop-admin.netlify.app`), `SHOP_URL`, `SELLER_URL`, `PAYMENT_CONFIRM_SECRET`, plus any optional ones from `.env.example`.
+3. In Supabase → **Authentication → URL Configuration**, set the **Site URL** to the shop's address. Under **Redirect URLs**, add `https://<shop>/**` and `https://<admin>/**`.
+4. Each push to `main` redeploys both sites. `netlify/functions/keep-alive.mts` runs once a day and queries the database, so the free Supabase project never pauses for inactivity.
