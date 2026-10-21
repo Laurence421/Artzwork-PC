@@ -4,7 +4,7 @@ import { SELLER_PREFIX, siteForHost } from "@/lib/site";
 import { supabaseEnv } from "./env";
 
 /** Seller-site pages a signed-out visitor may open. */
-const SELLER_PUBLIC = ["/login", "/signup", "/forgot-password", "/reset-password", "/auth/confirm", "/auth/signout"];
+const SELLER_PUBLIC = ["/login", "/forgot-password", "/reset-password", "/auth/confirm", "/auth/signout"];
 
 /**
  * Runs on every page request:

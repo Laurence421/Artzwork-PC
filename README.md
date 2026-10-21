@@ -61,7 +61,7 @@ Architecture decisions: [docs/adr/ADR-001-platform-architecture.md](docs/adr/ADR
 
 1. Create a free project at [supabase.com](https://supabase.com) (region close to your customers).
 2. Copy `.env.example` to `.env.local` and fill in the project URL and publishable key. Put the database URL in `.env.db` as `SUPABASE_DB_URL` (it never leaves your machine).
-3. In `supabase/migrations/20261020000600_single_store.sql`, replace `owner@example.com` with the shop owner's email. Only that account can open the admin.
+3. In `supabase/migrations/20261020000600_single_store.sql`, replace `owner@example.com` with the shop owner's email. Only that account can open the admin. The admin has no sign-up page: create that account on the shop's sign-up page, then log in on the admin.
 4. Apply the database and start:
    ```
    npm install

@@ -85,6 +85,8 @@ export async function login(_prev: AuthFormState, formData: FormData): Promise<A
 }
 
 export async function signup(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  // The seller site has no sign-up: the owner account already exists.
+  if ((await currentSite()) === "seller") return { error: "Sign-up is closed here." };
   const email = String(formData.get("email") ?? "").trim();
   const parsed = readCredentials(formData);
   if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error), values: { email } };

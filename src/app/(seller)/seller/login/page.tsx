@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { LoginScreen } from "@/features/shared/auth/auth-screens";
 import { SellerLogo } from "@/features/seller/components/seller-logo";
-import { AuthLink } from "@/features/shared/ui/auth-shell";
 
 export const metadata: Metadata = { title: "Seller login · Artzwork PC" };
 
@@ -11,7 +10,7 @@ export default function SellerLoginPage({ searchParams }: PageProps<"/seller/log
     <LoginScreen
       title="Log in"
       subtitle="Manage your shop."
-      footer={<>First time here? <AuthLink href="/signup">Create the owner account</AuthLink></>}
+      footer={<>Only the shop owner can log in here.</>}
       searchParams={searchParams}
       brand={<SellerLogo />}
     />
