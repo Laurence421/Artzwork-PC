@@ -8,6 +8,16 @@ An online store built for a Philippine PC shop: computer parts, PC sets and acce
 |---|---|---|
 | ![Product](docs/screenshots/product.png) | ![Phone](docs/screenshots/shop-home-phone.png) | ![Admin](docs/screenshots/admin-login.png) |
 
+### Admin (seller site)
+
+![Admin dashboard](docs/screenshots/admin-dashboard.png)
+
+| Orders | Order details | Products |
+|---|---|---|
+| ![Orders](docs/screenshots/admin-orders.png) | ![Order details](docs/screenshots/admin-order-detail.png) | ![Products](docs/screenshots/admin-products.png) |
+
+<sub>Admin screenshots use demo products and made-up customers.</sub>
+
 ## What it does
 
 **Shop (customers)**
