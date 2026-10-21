@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
@@ -24,7 +24,8 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.10",
-    "@tailwindcss/turbopack": "^4",
+    "@netlify/plugin-nextjs": "^5.16.4",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.19.2",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19",

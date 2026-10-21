@@ -50,3 +50,6 @@ RUN-IN-SUPABASE.sql
 
 # local editor / MCP tool settings (contain the Supabase project id)
 .mcp.json
+
+# Netlify CLI build output
+.netlify/

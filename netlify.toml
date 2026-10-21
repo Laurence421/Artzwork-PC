@@ -9,3 +9,7 @@
 [build.environment]
   NODE_VERSION = "22"
   NEXT_TELEMETRY_DISABLED = "1"
+
+# Pinned Next.js runtime (the newest release at the time of setup).
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
