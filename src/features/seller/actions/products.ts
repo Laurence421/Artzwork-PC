@@ -1,5 +1,6 @@
 "use server";
 
+import { removeUnusedImages } from "../lib/storage-cleanup";
 import { updateTag } from "next/cache";
 import { z } from "zod";
 import { CATALOG_TAG } from "@/features/shared/lib/cache-tags";
@@ -261,9 +262,16 @@ export async function saveProduct(_prev: ProductFormState, formData: FormData): 
   }
 
   if (removedPaths.length) await supabase.storage.from(ASSETS_BUCKET).remove(removedPaths);
+  await cleanUpProductPhotos(supabase, store.id);
 
   updateTag(CATALOG_TAG);
   return redirectOnSite("/products?saved=1");
+}
+
+/** Product photos uploaded but never saved with a product (or left from deleted ones) are removed. */
+async function cleanUpProductPhotos(supabase: Awaited<ReturnType<typeof getSellerStore>>["supabase"], storeId: string) {
+  const { data } = await supabase.from("product_images").select("path").eq("store_id", storeId);
+  if (data) await removeUnusedImages(supabase, storeId, "products", data.map((p) => p.path));
 }
 
 export type DeleteState = { error?: string };

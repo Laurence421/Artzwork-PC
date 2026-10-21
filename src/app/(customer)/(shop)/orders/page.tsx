@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { listMyOrders } from "@/features/customer/queries/account";
+import { myOrdersVersion } from "@/features/customer/actions/live";
+import { LiveUpdates } from "@/features/customer/components/auto-refresh";
+import { listMyOrders, type MyOrder } from "@/features/customer/queries/account";
 import { formatPrice } from "@/features/shared/lib/money";
 import { buttonClasses, focusRingClasses } from "@/features/shared/ui/button-styles";
 import { OrderStatusBadge } from "@/features/shared/ui/order-status-badge";
@@ -25,7 +27,17 @@ export default function MyOrdersPage() {
 }
 
 async function MyOrders() {
-  const orders = await listMyOrders();
+  const [orders, version] = await Promise.all([listMyOrders(), myOrdersVersion()]);
+  return (
+    <>
+      {/* The list updates itself when the shop changes one of these orders. */}
+      <LiveUpdates version={version} check={myOrdersVersion} every={30_000} />
+      <OrdersList orders={orders} />
+    </>
+  );
+}
+
+function OrdersList({ orders }: { orders: MyOrder[] }) {
   if (orders.length === 0) {
     return (
       <section className="flex flex-col items-start gap-4 rounded-2xl border border-border bg-surface p-6">

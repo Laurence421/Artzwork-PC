@@ -1,5 +1,6 @@
 "use client";
 
+import { shrinkImage } from "../lib/shrink-image";
 import Image from "next/image";
 import { useEffect, useId, useState } from "react";
 import { ASSETS_BUCKET } from "@/features/shared/lib/storage";
@@ -41,11 +42,13 @@ export function PhotoUploader({
     if (files.length > room) setError(`You can add up to ${MAX_PHOTOS} photos.`);
 
     const supabase = createClient();
-    for (const file of list) {
-      if (!TYPES.includes(file.type)) {
+    for (const original of list) {
+      if (!TYPES.includes(original.type)) {
         setError("Use JPG, PNG or WebP photos.");
         continue;
       }
+      // Smaller before upload (at most 1280 px, WebP): less storage, faster pages.
+      const file = await shrinkImage(original);
       if (file.size > MAX_BYTES) {
         setError(`${file.name} is over 5 MB. Use a smaller photo.`);
         continue;

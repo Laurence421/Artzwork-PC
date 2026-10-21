@@ -1,5 +1,6 @@
 "use client";
 
+import { shrinkImage } from "../lib/shrink-image";
 import Image from "next/image";
 import { useEffect, useId, useState } from "react";
 import { ASSETS_BUCKET } from "@/features/shared/lib/storage";
@@ -50,9 +51,11 @@ export function ImageUpload({
   const inputId = useId();
   useEffect(() => onBusyChange?.(busy), [busy, onBusyChange]);
 
-  async function upload(file: File) {
+  async function upload(original: File) {
     setError(null);
-    if (!TYPES.includes(file.type)) return setError("Use a JPG, PNG or WebP image.");
+    if (!TYPES.includes(original.type)) return setError("Use a JPG, PNG or WebP image.");
+    // Smaller before upload; QR codes keep more detail so they still scan.
+    const file = await shrinkImage(original, folder === "payments" ? { maxSide: 1200, quality: 0.95 } : {});
     if (file.size > MAX_BYTES) return setError("That image is over 5 MB. Use a smaller one.");
     setBusy(true);
     const supabase = createClient();

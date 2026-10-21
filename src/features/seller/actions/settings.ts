@@ -1,5 +1,6 @@
 "use server";
 
+import { removeUnusedImages } from "../lib/storage-cleanup";
 import { refresh, updateTag } from "next/cache";
 import { z } from "zod";
 import { isQrPh } from "@/features/shared/lib/qrph";
@@ -85,6 +86,8 @@ export async function savePayments(_prev: SettingsFormState, formData: FormData)
   }
 
   if (removedQrs.length) await supabase.storage.from(ASSETS_BUCKET).remove(removedQrs);
+  // QR images uploaded here but never saved (or older leftovers) are removed too.
+  await removeUnusedImages(supabase, store.id, "payments", input.map((p) => p.qrPath).filter((p): p is string => !!p));
   afterChange();
   return { message: "Payment methods saved." };
 }

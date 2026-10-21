@@ -1,5 +1,6 @@
 "use server";
 
+import { removeUnusedImages } from "../lib/storage-cleanup";
 import { refresh, updateTag } from "next/cache";
 import { z } from "zod";
 import { isReadableAccent, safeUrl, SOCIALS, type StoredBranding } from "@/features/shared/lib/branding";
@@ -95,6 +96,8 @@ export async function saveBranding(_prev: BrandingFormState, formData: FormData)
     (p): p is string => !!p && p !== images.logo && p !== images.favicon && p !== images.banner,
   );
   if (replaced.length) await supabase.storage.from(ASSETS_BUCKET).remove(replaced);
+  // Images uploaded here but never saved (or older leftovers) are removed too.
+  await removeUnusedImages(supabase, store.id, "branding", [images.logo, images.favicon, images.banner].filter((p): p is string => !!p));
 
   updateTag(CATALOG_TAG);
   refresh();

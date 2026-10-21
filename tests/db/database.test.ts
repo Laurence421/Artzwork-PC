@@ -814,3 +814,27 @@ describe("QR with the amount filled in", () => {
     await rejects(db.query("update public.payment_methods set qr_payload = 'https://evil.example' where id = $1", [id]), "check");
   });
 });
+
+describe("light change checks for live pages", () => {
+  it("an order's version moves only when its status changes; strangers get nothing", async () => {
+    const item = await addProduct({ name: "Hub", slug: "version-hub", price: 800, stock: 5 });
+    const buyer = await createUser(db, "version@example.com");
+    const token = (await placeOrder(buyer, [{ product_id: item, quantity: 1 }], { contact: { ...contact, email: "version@example.com" } })).tracking_token;
+    const version = async () =>
+      (await as(db, null, (tx) => tx.query<{ v: string | null }>("select public.order_version($1)::text as v", [token]))).rows[0].v;
+    const v1 = await version();
+    expect(v1).not.toBeNull();
+    expect(await version()).toBe(v1); // nothing changed
+    await as(db, seller, (tx) => tx.query("select public.update_order_status(id, 'paid') from public.orders where tracking_token = $1", [token]));
+    const v2 = await version();
+    expect(v2).not.toBe(v1);
+    const missing = await as(db, null, (tx) => tx.query<{ v: string | null }>("select public.order_version($1)::text as v", ["0".repeat(64)]));
+    expect(missing.rows[0].v).toBeNull();
+
+    const mine = await as(db, buyer, (tx) => tx.query<{ v: string | null }>("select public.my_orders_version()::text as v"));
+    expect(mine.rows[0].v).toBe(v2);
+    const others = await as(db, other, (tx) => tx.query<{ v: string | null }>("select public.my_orders_version()::text as v"));
+    expect(others.rows[0].v).toBeNull();
+    await rejects(as(db, null, (tx) => tx.query("select public.my_orders_version()")), "permission denied");
+  });
+});

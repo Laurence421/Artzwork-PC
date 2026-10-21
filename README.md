@@ -14,7 +14,7 @@ An online store built for a Philippine PC shop: computer parts, PC sets and acce
 - Browse by category, search, filter by price and sort; product pages with photos, sale prices and labels
 - Cart, **Order now**, guest or account checkout, store pickup or courier delivery
 - Pay by **GCash, bank transfer or cash on delivery**. Each manual order gets a unique amount (total + a few centavos), and the shop's GCash QR is turned into a **QR with that amount already filled in** (QR Ph / EMVCo, CRC-16)
-- Order tracking page: status steps, courier and tracking number, cancel until it ships, payment reference fallback
+- Order tracking page: status steps, courier and tracking number, cancel until it ships, payment reference fallback; it **updates by itself** when the shop changes the order
 - Accounts with email or Google: profile, saved addresses, My orders with a badge for new updates, forgot password, delete account
 
 **Admin (seller)**
@@ -31,8 +31,8 @@ An online store built for a Philippine PC shop: computer parts, PC sets and acce
 | **Stack** | Next.js 16 (App Router, Cache Components, server actions), React 19, TypeScript, Tailwind CSS 4, Supabase (Postgres, Auth, Storage) |
 | **Two sites, one app** | The proxy picks the site by host (`SELLER_HOST`) and serves the admin from `src/app/(seller)/seller`; logins are separate per site |
 | **Security** | Row-level security on every table; money and status changes only through `SECURITY DEFINER` functions; payments confirmed only by the server (shared secret, exact amount, idempotent); spam limits on unpaid orders; signed webhooks; password reset only from the email link; security headers (frame-ancestors, nosniff, HSTS) |
-| **Speed** | Pages pre-rendered and streamed; catalogue cached with tags and refreshed on change; session read from the ES256-signed token (no Auth round trip); AVIF/WebP images |
-| **Tests** | 69 unit and database tests (`vitest`, Postgres in memory via PGlite) plus browser end-to-end runs of checkout, payments, tracking and password reset |
+| **Speed & cost** | Pages pre-rendered and streamed; catalogue cached with tags and refreshed on change; session read from the ES256-signed token (no Auth round trip); photos shrunk to WebP in the browser before upload and served as AVIF/WebP; unused uploads removed automatically; live pages poll a one-row version check and re-render only on change |
+| **Tests** | 70 unit and database tests (`vitest`, Postgres in memory via PGlite) plus browser end-to-end runs of checkout, payments, tracking and password reset |
 
 Architecture decisions: [docs/adr/ADR-001-platform-architecture.md](docs/adr/ADR-001-platform-architecture.md).
 

@@ -4,7 +4,10 @@ import QRCode from "qrcode";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CancelOrder } from "@/features/customer/components/cancel-order";
+import { orderVersion } from "@/features/customer/actions/live";
+import { LiveUpdates } from "@/features/customer/components/auto-refresh";
 import { MarkOrderSeen } from "@/features/customer/components/mark-order-seen";
+import { OrderUpdatedNote } from "@/features/customer/components/order-updated-note";
 import { OnlinePayment } from "@/features/customer/components/online-payment";
 import { PaymentRefForm } from "@/features/customer/components/payment-ref-form";
 import { isPickup, trackingLink } from "@/features/shared/lib/couriers";
@@ -64,7 +67,7 @@ export default function OrderPage(props: PageProps<"/order/[token]">) {
 async function OrderView({ params, searchParams }: PageProps<"/order/[token]">) {
   const [{ token }, sp] = await Promise.all([params, searchParams]);
   if (!/^[0-9a-f]{64}$/.test(token)) notFound();
-  const { data } = await createPublicClient().rpc("get_order_by_token", { p_token: token });
+  const [{ data }, version] = await Promise.all([createPublicClient().rpc("get_order_by_token", { p_token: token }), orderVersion(token)]);
   const order = data as Order | null;
   if (!order) notFound();
 
@@ -85,6 +88,9 @@ async function OrderView({ params, searchParams }: PageProps<"/order/[token]">) 
   return (
     <>
       <MarkOrderSeen token={token} />
+      {/* Open orders update themselves (status, payment, courier) when the shop changes them. */}
+      {order.status !== "completed" && order.status !== "cancelled" && <LiveUpdates version={version} check={orderVersion.bind(null, token)} />}
+      <OrderUpdatedNote status={order.status} label={label(order.status)} />
       {sp.paid === "1" && pay.online && order.status !== "pending" && order.status !== "cancelled" && (
         <FormAlert tone="success" title={`Payment received for order #${order.order_no}.`}>
           Thank you! The shop will prepare your order. Bookmark this page to follow it.

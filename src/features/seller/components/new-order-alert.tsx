@@ -15,7 +15,7 @@ import type { LatestOrder } from "../queries/orders";
 export function NewOrderAlert({
   initial,
   check,
-  every = 30_000,
+  every = 20_000,
 }: {
   initial: LatestOrder;
   check: () => Promise<LatestOrder>;
